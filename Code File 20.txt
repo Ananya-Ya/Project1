@@ -1,0 +1,532 @@
+** Code File **
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from statsmodels.tsa.seasonal import seasonal_decompose
+import pandas as pd
+import matplotlib.pyplot as plt
+from statsmodels.tsa.arima_model import ARIMA
+import pandas as pd
+import plotly.graph_objects as go
+import plotly.express as px
+from statsmodels.tsa.seasonal import seasonal_decompose
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from statsmodels.tsa.seasonal import seasonal_decompose
+import pandas as pd
+import plotly.graph_objects as go
+import plotly.express as px
+import pandas as pd
+
+
+
+
+
+
+
+# Load dataset
+df = pd.read_csv('time_series_data.csv', index_col='date', parse_dates=True)
+
+# Ensure data is sorted by date
+df.sort_index(inplace=True)
+
+# Time Series Plot
+def plot_time_series(df):
+    plt.figure(figsize=(14, 8))
+    plt.plot(df['value'], label='Original Data', color='blue')
+    plt.title('Time Series Plot')
+    plt.xlabel('Date')
+    plt.ylabel('Value')
+    plt.legend()
+    plt.grid(True)
+    plt.savefig('time_series_plot.png')
+    plt.show()
+
+# Moving Average Plot
+def plot_moving_average(df):
+    plt.figure(figsize=(14, 8))
+    plt.plot(df['value'], label='Original Data', color='blue')
+    plt.plot(df['value'].rolling(window=12).mean(), label='12-Month Moving Average', color='red')
+    plt.title('Time Series Plot with Moving Average')
+    plt.xlabel('Date')
+    plt.ylabel('Value')
+    plt.legend()
+    plt.grid(True)
+    plt.savefig('time_series_with_moving_avg.png')
+    plt.show()
+
+# Seasonal Decomposition Plot
+def plot_seasonal_decomposition(df):
+    decomposition = seasonal_decompose(df['value'], model='additive')
+    
+    plt.figure(figsize=(14, 12))
+    
+    plt.subplot(4, 1, 1)
+    plt.plot(df['value'], label='Original Data', color='blue')
+    plt.title('Original Time Series')
+    plt.xlabel('Date')
+    plt.ylabel('Value')
+    plt.legend()
+    
+    plt.subplot(4, 1, 2)
+    plt.plot(decomposition.trend, label='Trend', color='green')
+    plt.title('Trend Component')
+    plt.xlabel('Date')
+    plt.ylabel('Value')
+    plt.legend()
+    
+    plt.subplot(4, 1, 3)
+    plt.plot(decomposition.seasonal, label='Seasonal', color='orange')
+    plt.title('Seasonal Component')
+    plt.xlabel('Date')
+    plt.ylabel('Value')
+    plt.legend()
+    
+    plt.subplot(4, 1, 4)
+    plt.plot(decomposition.resid, label='Residual', color='red')
+    plt.title('Residual Component')
+    plt.xlabel('Date')
+    plt.ylabel('Value')
+    plt.legend()
+    
+    plt.tight_layout()
+    plt.savefig('seasonal_decomposition.png')
+    plt.show()
+
+# Rolling Statistics Plot
+def plot_rolling_statistics(df):
+    rolling_mean = df['value'].rolling(window=12).mean()
+    rolling_std = df['value'].rolling(window=12).std()
+    
+    plt.figure(figsize=(14, 8))
+    plt.plot(df['value'], label='Original Data', color='blue')
+    plt.plot(rolling_mean, label='Rolling Mean', color='red')
+    plt.plot(rolling_std, label='Rolling Std Dev', color='orange')
+    plt.title('Rolling Statistics')
+    plt.xlabel('Date')
+    plt.ylabel('Value')
+    plt.legend()
+    plt.grid(True)
+    plt.savefig('rolling_statistics.png')
+    plt.show()
+
+# Box Plot by Month
+def plot_box_plot_by_month(df):
+    df['month'] = df.index.month
+    df['year'] = df.index.year
+    
+    plt.figure(figsize=(14, 8))
+    sns.boxplot(x='month', y='value', data=df)
+    plt.title('Box Plot of Values by Month')
+    plt.xlabel('Month')
+    plt.ylabel('Value')
+    plt.grid(True)
+    plt.savefig('box_plot_by_month.png')
+    plt.show()
+
+# Heatmap of Monthly Averages
+def plot_monthly_heatmap(df):
+    df['month'] = df.index.month
+    df['year'] = df.index.year
+    monthly_avg = df.groupby(['year', 'month'])['value'].mean().unstack()
+    
+    plt.figure(figsize=(14, 8))
+    sns.heatmap(monthly_avg, cmap='coolwarm', annot=True, fmt=".2f")
+    plt.title('Monthly Average Heatmap')
+    plt.xlabel('Month')
+    plt.ylabel('Year')
+    plt.savefig('monthly_heatmap.png')
+    plt.show()
+
+# Histogram of Value Distribution
+def plot_histogram(df):
+    plt.figure(figsize=(14, 8))
+    plt.hist(df['value'], bins=30, edgecolor='k', alpha=0.7)
+    plt.title('Histogram of Value Distribution')
+    plt.xlabel('Value')
+    plt.ylabel('Frequency')
+    plt.grid(True)
+    plt.savefig('histogram.png')
+    plt.show()
+
+# Cumulative Sum Plot
+def plot_cumulative_sum(df):
+    df['cumulative_sum'] = df['value'].cumsum()
+    
+    plt.figure(figsize=(14, 8))
+    plt.plot(df['cumulative_sum'], label='Cumulative Sum', color='purple')
+    plt.title('Cumulative Sum of Values')
+    plt.xlabel('Date')
+    plt.ylabel('Cumulative Sum')
+    plt.legend()
+    plt.grid(True)
+    plt.savefig('cumulative_sum.png')
+    plt.show()
+
+# Main Function
+if __name__ == "__main__":
+    plot_time_series(df)
+    plot_moving_average(df)
+    plot_seasonal_decomposition(df)
+    plot_rolling_statistics(df)
+    plot_box_plot_by_month(df)
+    plot_monthly_heatmap(df)
+    plot_histogram(df)
+    plot_cumulative_sum(df)
+
+
+# Load dataset
+df = pd.read_csv('time_series_data.csv', index_col='date', parse_dates=True)
+df.sort_index(inplace=True)
+
+# Time Series Plot with Moving Average using Plotly
+def interactive_time_series_plot(df):
+    fig = go.Figure()
+
+    # Original Data
+    fig.add_trace(go.Scatter(x=df.index, y=df['value'], mode='lines', name='Original Data'))
+
+    # Moving Average
+    moving_avg = df['value'].rolling(window=12).mean()
+    fig.add_trace(go.Scatter(x=df.index, y=moving_avg, mode='lines', name='12-Month Moving Average', line=dict(color='red')))
+
+    fig.update_layout(title='Interactive Time Series Plot with Moving Average',
+                      xaxis_title='Date',
+                      yaxis_title='Value',
+                      template='plotly_dark')
+    fig.write_html('interactive_time_series_plot.html')
+    fig.show()
+
+# Interactive Seasonal Decomposition Plot
+def interactive_seasonal_decomposition(df):
+    decomposition = seasonal_decompose(df['value'], model='additive')
+
+    fig = go.Figure()
+
+    # Original Data
+    fig.add_trace(go.Scatter(x=df.index, y=df['value'], mode='lines', name='Original Data'))
+
+    # Trend
+    fig.add_trace(go.Scatter(x=df.index, y=decomposition.trend, mode='lines', name='Trend', line=dict(color='green')))
+
+    # Seasonal
+    fig.add_trace(go.Scatter(x=df.index, y=decomposition.seasonal, mode='lines', name='Seasonal', line=dict(color='orange')))
+
+    # Residual
+    fig.add_trace(go.Scatter(x=df.index, y=decomposition.resid, mode='lines', name='Residual', line=dict(color='red')))
+
+    fig.update_layout(title='Interactive Seasonal Decomposition',
+                      xaxis_title='Date',
+                      yaxis_title='Value',
+                      template='plotly_dark')
+    fig.write_html('interactive_seasonal_decomposition.html')
+    fig.show()
+
+if __name__ == "__main__":
+    interactive_time_series_plot(df)
+    interactive_seasonal_decomposition(df)
+
+# Load dataset
+df = pd.read_csv('time_series_data.csv', index_col='date', parse_dates=True)
+df.sort_index(inplace=True)
+
+# Rolling Statistics with Plotly
+def plot_rolling_statistics_plotly(df):
+    rolling_mean = df['value'].rolling(window=12).mean()
+    rolling_std = df['value'].rolling(window=12).std()
+
+    fig = go.Figure()
+
+    # Original Data
+    fig.add_trace(go.Scatter(x=df.index, y=df['value'], mode='lines', name='Original Data'))
+
+    # Rolling Mean
+    fig.add_trace(go.Scatter(x=df.index, y=rolling_mean, mode='lines', name='Rolling Mean', line=dict(color='red')))
+
+    # Rolling Std Dev
+    fig.add_trace(go.Scatter(x=df.index, y=rolling_std, mode='lines', name='Rolling Std Dev', line=dict(color='orange')))
+
+    fig.update_layout(title='Rolling Statistics',
+                      xaxis_title='Date',
+                      yaxis_title='Value',
+                      template='plotly_dark')
+    fig.write_html('rolling_statistics_plotly.html')
+    fig.show()
+
+# Advanced Seasonal Decomposition with Subplots
+def advanced_seasonal_decomposition(df):
+    decomposition = seasonal_decompose(df['value'], model='additive')
+
+    plt.figure(figsize=(14, 12))
+
+    plt.subplot(4, 1, 1)
+    plt.plot(df['value'], label='Original Data', color='blue')
+    plt.title('Original Time Series')
+    plt.xlabel('Date')
+    plt.ylabel('Value')
+    plt.legend()
+
+    plt.subplot(4, 1, 2)
+    plt.plot(decomposition.trend, label='Trend', color='green')
+    plt.title('Trend Component')
+    plt.xlabel('Date')
+    plt.ylabel('Value')
+    plt.legend()
+
+    plt.subplot(4, 1, 3)
+    plt.plot(decomposition.seasonal, label='Seasonal', color='orange')
+    plt.title('Seasonal Component')
+    plt.xlabel('Date')
+    plt.ylabel('Value')
+    plt.legend()
+
+    plt.subplot(4, 1, 4)
+    plt.plot(decomposition.resid, label='Residual', color='red')
+    plt.title('Residual Component')
+    plt.xlabel('Date')
+    plt.ylabel('Value')
+    plt.legend()
+
+    plt.tight_layout()
+    plt.savefig('advanced_seasonal_decomposition.png')
+    plt.show()
+
+if __name__ == "__main__":
+    plot_rolling_statistics_plotly(df)
+    advanced_seasonal_decomposition(df)
+
+
+# Load dataset
+df = pd.read_csv('time_series_data.csv', index_col='date', parse_dates=True)
+df.sort_index(inplace=True)
+
+# Cumulative Sum Plot
+def interactive_cumulative_sum_plot(df):
+    df['cumulative_sum'] = df['value'].cumsum()
+
+    fig = go.Figure()
+
+    fig.add_trace(go.Scatter(x=df.index, y=df['cumulative_sum'], mode='lines', name='Cumulative Sum', line=dict(color='purple')))
+
+    fig.update_layout(title='Interactive Cumulative Sum Plot',
+                      xaxis_title='Date',
+                      yaxis_title='Cumulative Sum',
+                      template='plotly_dark')
+    fig.write_html('interactive_cumulative_sum.html')
+    fig.show()
+
+# Histogram with Plotly
+def interactive_histogram(df):
+    fig = px.histogram(df, x='value', nbins=30, title='Interactive Histogram of Value Distribution')
+    fig.update_layout(xaxis_title='Value', yaxis_title='Frequency', template='plotly_dark')
+    fig.write_html('interactive_histogram.html')
+    fig.show()
+
+if __name__ == "__main__":
+    interactive_cumulative_sum_plot(df)
+    interactive_histogram(df)
+
+
+# Load and preprocess dataset
+def preprocess_data(file_path):
+    df = pd.read_csv(file_path, index_col='date', parse_dates=True)
+    
+    # Ensure data is sorted by date
+    df.sort_index(inplace=True)
+    
+    # Handle missing values (e.g., fill with forward fill method)
+    df.fillna(method='ffill', inplace=True)
+    
+    # Ensure that there are no duplicate index entries
+    df = df[~df.index.duplicated(keep='first')]
+    
+    # Save cleaned data
+    df.to_csv('cleaned_time_series_data.csv')
+    return df
+
+if __name__ == "__main__":
+    preprocess_data('time_series_data.csv')
+
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Load dataset
+df = pd.read_csv('cleaned_time_series_data.csv', index_col='date', parse_dates=True)
+df.sort_index(inplace=True)
+
+# Monthly Averages Plot
+def plot_monthly_averages(df):
+    df['month'] = df.index.month
+    monthly_avg = df.groupby('month')['value'].mean()
+
+    plt.figure(figsize=(12, 6))
+    monthly_avg.plot(kind='bar', color='skyblue')
+    plt.title('Average Value by Month')
+    plt.xlabel('Month')
+    plt.ylabel('Average Value')
+    plt.grid(True)
+    plt.savefig('monthly_averages.png')
+    plt.show()
+
+# Yearly Averages Plot
+def plot_yearly_averages(df):
+    df['year'] = df.index.year
+    yearly_avg = df.groupby('year')['value'].mean()
+
+    plt.figure(figsize=(12, 6))
+    yearly_avg.plot(kind='line', marker='o', color='coral')
+    plt.title('Average Value by Year')
+    plt.xlabel('Year')
+    plt.ylabel('Average Value')
+    plt.grid(True)
+    plt.savefig('yearly_averages.png')
+    plt.show()
+
+if __name__ == "__main__":
+    plot_monthly_averages(df)
+    plot_yearly_averages(df)
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from statsmodels.tsa.seasonal import seasonal_decompose
+from statsmodels.tsa.stattools import adfuller
+
+# Load dataset
+df = pd.read_csv('cleaned_time_series_data.csv', index_col='date', parse_dates=True)
+df.sort_index(inplace=True)
+
+# Function for Augmented Dickey-Fuller Test
+def adf_test(df):
+    result = adfuller(df['value'])
+    print('ADF Statistic:', result[0])
+    print('p-value:', result[1])
+    print('Critical Values:', result[4])
+
+# Plotting Seasonal Decomposition
+def plot_seasonal_decomposition(df):
+    decomposition = seasonal_decompose(df['value'], model='additive')
+    
+    plt.figure(figsize=(14, 12))
+    
+    plt.subplot(4, 1, 1)
+    plt.plot(df['value'], label='Original Data', color='blue')
+    plt.title('Original Time Series')
+    plt.xlabel('Date')
+    plt.ylabel('Value')
+    plt.legend()
+    
+    plt.subplot(4, 1, 2)
+    plt.plot(decomposition.trend, label='Trend', color='green')
+    plt.title('Trend Component')
+    plt.xlabel('Date')
+    plt.ylabel('Value')
+    plt.legend()
+    
+    plt.subplot(4, 1, 3)
+    plt.plot(decomposition.seasonal, label='Seasonal', color='orange')
+    plt.title('Seasonal Component')
+    plt.xlabel('Date')
+    plt.ylabel('Value')
+    plt.legend()
+    
+    plt.subplot(4, 1, 4)
+    plt.plot(decomposition.resid, label='Residual', color='red')
+    plt.title('Residual Component')
+    plt.xlabel('Date')
+    plt.ylabel('Value')
+    plt.legend()
+    
+    plt.tight_layout()
+    plt.savefig('advanced_seasonal_decomposition.png')
+    plt.show()
+
+if __name__ == "__main__":
+    adf_test(df)
+    plot_seasonal_decomposition(df)
+
+import pandas as pd
+import plotly.graph_objects as go
+
+# Load dataset
+df = pd.read_csv('cleaned_time_series_data.csv', index_col='date', parse_dates=True)
+df.sort_index(inplace=True)
+
+# Interactive Plot for Rolling Statistics
+def interactive_rolling_statistics(df):
+    rolling_mean = df['value'].rolling(window=12).mean()
+    rolling_std = df['value'].rolling(window=12).std()
+
+    fig = go.Figure()
+
+    # Original Data
+    fig.add_trace(go.Scatter(x=df.index, y=df['value'], mode='lines', name='Original Data'))
+
+    # Rolling Mean
+    fig.add_trace(go.Scatter(x=df.index, y=rolling_mean, mode='lines', name='Rolling Mean', line=dict(color='red')))
+
+    # Rolling Std Dev
+    fig.add_trace(go.Scatter(x=df.index, y=rolling_std, mode='lines', name='Rolling Std Dev', line=dict(color='orange')))
+
+    fig.update_layout(title='Interactive Rolling Statistics',
+                      xaxis_title='Date',
+                      yaxis_title='Value',
+                      template='plotly_dark')
+    fig.write_html('interactive_rolling_statistics.html')
+    fig.show()
+
+# Interactive Moving Average Plot
+def interactive_moving_average_plot(df):
+    moving_avg = df['value'].rolling(window=12).mean()
+
+    fig = go.Figure()
+
+    # Original Data
+    fig.add_trace(go.Scatter(x=df.index, y=df['value'], mode='lines', name='Original Data'))
+
+    # Moving Average
+    fig.add_trace(go.Scatter(x=df.index, y=moving_avg, mode='lines', name='Moving Average', line=dict(color='red')))
+
+    fig.update_layout(title='Interactive Moving Average Plot',
+                      xaxis_title='Date',
+                      yaxis_title='Value',
+                      template='plotly_dark')
+    fig.write_html('interactive_moving_average.html')
+    fig.show()
+
+if __name__ == "__main__":
+    interactive_rolling_statistics(df)
+    interactive_moving_average_plot(df)
+
+# Load dataset
+df = pd.read_csv('cleaned_time_series_data.csv', index_col='date', parse_dates=True)
+df.sort_index(inplace=True)
+
+# Function to fit ARIMA model and forecast
+def arima_forecasting(df, order=(5, 1, 0)):
+    model = ARIMA(df['value'], order=order)
+    model_fit = model.fit(disp=0)
+    
+    # Forecast
+    forecast = model_fit.forecast(steps=12)[0]
+
+    # Plot
+    plt.figure(figsize=(14, 8))
+    plt.plot(df.index, df['value'], label='Original Data', color='blue')
+    plt.plot(pd.date_range(start=df.index[-1], periods=13, freq='M')[1:], forecast, label='Forecast', color='red')
+    plt.title('ARIMA Forecasting')
+    plt.xlabel('Date')
+    plt.ylabel('Value')
+    plt.legend()
+    plt.grid(True)
+    plt.savefig('arima_forecasting.png')
+    plt.show()
+
+if __name__ == "__main__":
+    arima_forecasting(df)
